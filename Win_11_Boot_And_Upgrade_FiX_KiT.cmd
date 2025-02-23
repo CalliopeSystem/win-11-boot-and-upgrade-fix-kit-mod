@@ -14,10 +14,11 @@ SET "MOUNT_DIR=Mount"
 SET "DRIVER_PATH=Drivers"
 SET "Disable_BitLocker=0"
 SET "Disable_MS_Account=0"
+SET "DisableWpbt=0"
 SET "OfflineInsiderEnroll=0"
 
 ::Options to set by dev
-SET "Version=v6.0f"
+SET "Version=v6.1f"
 SET "UFWS_version=v1.4"
 
 REM change wording if needed..
@@ -119,6 +120,7 @@ SET select13=0
 SET select14=0
 SET select15=0
 SET select16=0
+SET select17=0
 IF /I "%App_Res_Dll%"=="1" SET select6=1
 IF /I "%Diskpart_and_Apply%"=="1" SET select7=1
 IF /I "%EI_CFG_ADD%"=="1" SET select8=1
@@ -130,6 +132,7 @@ IF /I "%Disable_MS_Account%"=="1" SET select13=1
 IF /I "%OfflineInsiderEnroll%"=="1" SET select14=1
 IF /I "%PID_TXT_ADD%"=="1" SET select15=1
 IF /I "%Split_WIM_Opt%"=="1" SET select16=1
+IF /I "%DisableWpbt%"=="1" SET select17=1
 :Loop
 @CLS
 ::ECHO.
@@ -154,6 +157,7 @@ SET "option13={ }"
 SET "option14={ }"
 SET "option15={ }"
 SET "option16={ }"
+SET "option17={ }"
 IF %select1%==1 SET "option1={*}"
 IF %select2%==1 SET "option2={*}"
 IF %select3%==1 SET "option3={*}"
@@ -170,6 +174,7 @@ IF %select13%==1 SET "option13={*}"
 IF %select14%==1 SET "option14={*}"
 IF %select15%==1 SET "option15={*}"
 IF %select16%==1 SET "option16={*}"
+IF %select17%==1 SET "option17={*}"
 ECHO.
 ECHO ====================================== Fixes =======================================
 ECHO.
@@ -193,10 +198,11 @@ ECHO [ M ] %option13% Disable requirement for Microsoft Account during setup
 ECHO [ O ] %option14% Copy OfflineInsiderEnroll script to enable Windows Insider ISOs without Microsoft Account
 ECHO [ P ] %option15% Add custom product key to PID.txt
 ECHO [ S ] %option16% Split install.wim to 4GB for FAT32 USB sticks
+ECHO [ W ] %option17% Disable Windows Platform Binary Table software auto installation
 ECHO.
 ECHO ====================================================================================
 SET CHOICE=0
-choice /c 123456789ABDMOPS0 /n /m "Select desired option(s), then press 0 to start the process: "
+choice /c 123456789ABDMOPSW0Q /n /m "Select desired option(s), then press 0 to start the process or press Q to quit: "
 set CHOICE=%errorlevel%
 if %CHOICE%==1 (if %select1%==1 (set select1=0) else (set select1=1&set select5=0&set select2=0&set select3=0)&goto :Loop)
 if %CHOICE%==2 (if %select2%==1 (set select2=0) else (set select2=1&set select5=0&set select1=0)&goto :Loop)
@@ -214,8 +220,15 @@ if %CHOICE%==13 (if %select13%==1 (set select13=0) else (set select13=1)&goto :L
 if %CHOICE%==14 (if %select14%==1 (set select14=0) else (set select14=1)&goto :Loop)
 if %CHOICE%==15 (if %select15%==1 (set select15=0) else (set select15=1)&goto :Loop)
 if %CHOICE%==16 (if %select16%==1 (set select16=0) else (set select16=1)&goto :Loop)
-if %CHOICE%==17 goto :Begin
+if %CHOICE%==17 (if %select17%==1 (set select17=0) else (set select17=1)&goto :Loop)
+if %CHOICE%==18 goto :Begin
+if %CHOICE%==19 goto :LogQuit
 goto :Loop
+
+:LogQuit
+echo User quit before script was executed.>> %LOG_FILE%
+if exist "%lockfile%" del /f /q "%lockfile%"
+exit /bs
 
 :Begin
 if %select3%==1 if %select1%==0 if %select2%==0 if %select4%==0 if %select5%==0 (
@@ -245,6 +258,7 @@ if %select13%==1 (SET "Disable_MS_Account=1") else (SET "Disable_MS_Account=0")
 if %select14%==1 (SET "OfflineInsiderEnroll=1") else (SET "OfflineInsiderEnroll=0")
 if %select15%==1 (SET "PID_TXT_ADD=1") else (SET "PID_TXT_ADD=0")
 if %select16%==1 (SET "Split_WIM_Opt=1") else (SET "Split_WIM_Opt=0")
+if %select17%==1 (SET "DisableWpbt=1") else (SET "DisableWpbt=0")
 
 :: Echo selected options to log file
 ECHO Selected options:>> %LOG_FILE%
@@ -263,6 +277,7 @@ if %select13%==1 (ECHO [ M ] %option13% Disable requirement for Microsoft Accoun
 if %select14%==1 (ECHO [ O ] %option14% Copy OfflineInsiderEnroll script to enable Windows Insider ISOs without Microsoft Account>> %LOG_FILE%)
 if %select15%==1 (ECHO [ P ] %option15% Add custom product key to PID.txt>> %LOG_FILE%)
 if %select16%==1 (ECHO [ S ] %option16% Split install.wim for FAT32 USB sticks>> %LOG_FILE%)
+if %select17%==1 (ECHO [ W ] %option17% Disable Windows Platform Binary Table software auto installation>> %LOG_FILE%)
 
 if %FiX_W10_ISO%==1 if not exist "Source_ISO\W10\*.iso" (
 ECHO. | "%_tee%" -a "%LOG_FILE%"
@@ -821,6 +836,7 @@ COPY /Y "Files\24H2_Online_Upgrade_Enabler_Script.cmd" "WORK\" | "%_tee%" -a "%L
 if "%OfflineInsiderEnroll%"=="1" call :offlineinsiderenroll
 if "%Disable_BitLocker%"=="1" call :disablebitlocker
 if "%Disable_MS_Account%"=="1" call :disablemsaccount
+if "%DisableWpbt%"=="1" call :disablewpbt
 if "%Add_Drivers%"=="1" call :adddrivers
 if "%Split_WIM_Opt%"=="0" (
     if "!Conv_ESD_Opt!"=="1" (
@@ -873,6 +889,7 @@ COPY /Y "Files\24H2_Online_Upgrade_Enabler_Script.cmd" "WORK\" | "%_tee%" -a "%L
 if "%OfflineInsiderEnroll%"=="1" call :offlineinsiderenroll
 if "%Disable_BitLocker%"=="1" call :disablebitlocker
 if "%Disable_MS_Account%"=="1" call :disablemsaccount
+if "%DisableWpbt%"=="1" call :disablewpbt
 if "%Add_Drivers%"=="1" call :adddrivers
 if "%Split_WIM_Opt%"=="0" (
     if "!Conv_ESD_Opt!"=="1" (
@@ -1805,4 +1822,102 @@ ECHO Copying OfflineInsiderEnroll.cmd to ISO dir... | "%_tee%" -a "%LOG_FILE%"
 ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
 ECHO. | "%_tee%" -a "%LOG_FILE%"
 COPY /Y "Files\OfflineInsiderEnroll.cmd" "WORK\" | "%_tee%" -a "%LOG_FILE%"
+exit /b
+
+:disablewpbt
+:: Step 1: Create the mount directory if it doesn't exist
+if not exist %MOUNT_DIR% mkdir %MOUNT_DIR%
+
+:: Step 2: Get path of install.wim file and convert it if necessary
+call :getfileext Work\Sources\%WIMFILE%
+set fileExt=!fileExt!
+if /i "%fileExt%" == "wim" (
+    ECHO. | "%_tee%" -a "%LOG_FILE%"
+	ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+    ECHO Work\sources\%WIMFILE% is a .wim file, no conversion needed. | "%_tee%" -a "%LOG_FILE%"
+    ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+	ECHO. | "%_tee%" -a "%LOG_FILE%"
+) else if /i "%fileExt%" == "esd" (
+    ECHO. | "%_tee%" -a "%LOG_FILE%"
+	ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+    ECHO Work\sources\%WIMFILE% is a .esd file, converting into a wim file. | "%_tee%" -a "%LOG_FILE%"
+    ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+	ECHO. | "%_tee%" -a "%LOG_FILE%"
+    call :esdtowim Work\sources\%WIMFILE% Work\sources\install.wim
+    if errorlevel 1 (
+	    ECHO. | "%_tee%" -a "%LOG_FILE%"
+		ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+        ECHO ERROR: Failed to convert .esd to .wim. | "%_tee%" -a "%LOG_FILE%"
+        ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+		ECHO. | "%_tee%" -a "%LOG_FILE%"
+        exit /b 1
+    )
+	set "Conv_ESD_Opt=1"
+    set WIMFILE=install.wim
+) else if /i "%fileExt%" == "swm" (
+    ECHO. | "%_tee%" -a "%LOG_FILE%"
+	ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+    ECHO Work\sources\%WIMFILE% is a .swm file, converting into a wim file. | "%_tee%" -a "%LOG_FILE%"
+    ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+	ECHO. | "%_tee%" -a "%LOG_FILE%"
+    call :convertswm Work\sources\%WIMFILE% Work\sources\install.wim
+    if errorlevel 1 (
+	    ECHO. | "%_tee%" -a "%LOG_FILE%"
+		ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+        ECHO ERROR: Failed to convert .swm to .wim. | "%_tee%" -a "%LOG_FILE%"
+        ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+		ECHO. | "%_tee%" -a "%LOG_FILE%"
+        exit /b 1
+    )
+    set WIMFILE=install.wim
+    set Split_WIM_Opt=1
+) else (
+    ECHO. | "%_tee%" -a "%LOG_FILE%"
+	ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+    ECHO ERROR: Work\sources\%WIMFILE% is not .wim, .esd, or .swm. | "%_tee%" -a "%LOG_FILE%"
+    ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+	ECHO. | "%_tee%" -a "%LOG_FILE%"
+    exit /b 1
+)
+
+:: Step 3: Get the number of images in the Install WIM file
+for /L %%A IN (1, 1, 25) Do (
+dism /Get-WimInfo /WimFile:"Work\sources\%WIMFILE%" /index:%%A > %CD%\TEMP\%%A
+timeout 0 >nul
+Find /i "Error:" "%CD%\TEMP\%%A" > nul && (
+     set "Index=%%A"
+       goto:setinstallimagecountbit
+)
+)
+ECHO. | "%_tee%" -a "%LOG_FILE%"
+ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+ECHO ERROR: Failed to get image count from Work\sources\%WIMFILE% | "%_tee%" -a "%LOG_FILE%"
+ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+ECHO. | "%_tee%" -a "%LOG_FILE%"
+exit /b 1
+:setinstallimagecountbit
+set /A INSTALL_IMAGE_COUNT = %Index% - 1
+
+for /L %%A in (1, 1, %Index%) do (
+    del /q %CD%\TEMP\%%A
+)
+
+echo Number of images detected in install.wim: %INSTALL_IMAGE_COUNT% | "%_tee%" -a "%LOG_FILE%"
+
+:: Step 4: Loop through each image in install and modify registry
+for /L %%i in (1,1,%INSTALL_IMAGE_COUNT%) do (
+	%_wimlib% extract "WORK\sources\install.wim" %%i \Windows\System32\config\SYSTEM --no-acls --no-attributes --dest-dir="TEMP" | "%_tee%" -a "%LOG_FILE%"
+
+    ECHO. | "%_tee%" -a "%LOG_FILE%"
+	ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+    ECHO Adding DisableWpbtExecution registry to image %%i: | "%_tee%" -a "%LOG_FILE%"
+	ECHO ============================================================= | "%_tee%" -a "%LOG_FILE%"
+	ECHO. | "%_tee%" -a "%LOG_FILE%"
+    SET "ACF=HKLM\MDL_Test\ControlSet001\Control"
+    Reg.exe load HKLM\MDL_Test "TEMP\SYSTEM" | "%_tee%" -a "%LOG_FILE%"
+    Reg.exe add "%ACF%\Session Manager" /v DisableWpbtExecution /t REG_DWORD /d 1 /f | "%_tee%" -a "%LOG_FILE%"
+    Reg.exe unload HKLM\MDL_Test | "%_tee%" -a "%LOG_FILE%"
+
+%_wimlib% update "WORK\sources\install.wim" %%i --command="add 'TEMP\SYSTEM' '\Windows\System32\config\SYSTEM'" | "%_tee%" -a "%LOG_FILE%"
+)
 exit /b

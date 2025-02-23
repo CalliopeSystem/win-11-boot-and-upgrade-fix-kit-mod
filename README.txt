@@ -1,4 +1,4 @@
-Win 11 Boot And Upgrade FiX KiT v6.0f
+Win 11 Boot And Upgrade FiX KiT v6.1f
 
 Crappy Tools By Enthousiast @MDL modded by bloodrain @MDL
 
@@ -6,7 +6,7 @@ Support: https://forums.mydigitallife.net/threads/win-11-boot-and-upgrade-fix-ki
 
 Do not ask for support on this modded version on MDL! Create an issue on GitHub:
 
-https://github.com/KittehCream/win-11-boot-and-upgrade-fix-kit-mod
+https://github.com/EntropyKitty/win-11-boot-and-upgrade-fix-kit-mod
 
 - The tool provides multiple fixes (inclusing the option to install 11 on a legacy-Bios system).
 - You can select AIO 1 or 2 to choose the recommended combinations.
@@ -124,6 +124,10 @@ Cons:
 
 - Allows copying ISO files directly to a FAT32 USB stick for UEFI booting and creating a USB stick that uses FAT32 (not UEFI:NTFS, Secure Boot compatible) with Rufus
 
+[ W ] Disable Windows Platform Binary Table software auto installation
+
+- Disabled automatic installation of software embedded in the Windows Platform Binary Table, such as ASUS Armoury Crate and McAfee Antivirus. (These are only two known examples) This can be considered an annoyance and security risk by some.
+
 =================================== Bonus =====================================
 
 # The following are manual options, which can be disabled only by editing the script.
@@ -148,11 +152,16 @@ Official (support) thread: https://forums.mydigitallife.net/threads/win-11-boot-
 
 Do not ask for support on this modded version on MDL! Create an issue on GitHub:
 
-https://github.com/KittehCream/win-11-boot-and-upgrade-fix-kit-mod
+https://github.com/EntropyKitty/win-11-boot-and-upgrade-fix-kit-mod
 
 ====================================================================
 
 Changelog:
+
+6.1f
+Added placeholders so GitHub wouldn't remove empty folders
+Added option to disable software auto-installation from Windows Platform Binary Table
+Added option to quit (removes lock file cleanly) from the main menu
 
 6.0f
 
