@@ -6,9 +6,9 @@ Support: https://forums.mydigitallife.net/threads/win-11-boot-and-upgrade-fix-ki
 
 Do not ask for support on this modded version on MDL! Create an issue on GitHub:
 
-https://github.com/EntropyKitty/win-11-boot-and-upgrade-fix-kit-mod
+https://github.com/CalliopeSystem/win-11-boot-and-upgrade-fix-kit-mod
 
-- The tool provides multiple fixes (inclusing the option to install 11 on a legacy-Bios system).
+- The tool provides multiple fixes (including the option to install 11 on a legacy-Bios system).
 - You can select AIO 1 or 2 to choose the recommended combinations.
 - If Fix 3 is chosen alone, it will be applied solely for current OS.
 - If Fix 6 is chosen, it will be applied solely.
@@ -142,7 +142,7 @@ Cons:
 
 Diskpart and Apply Image usage instructions:
 
-After selecting the desired keyboard language press "SHIFT+F10" to open commandprompt and type "menu", press "Y" and next "F" and "Y" again.
+After selecting the desired keyboard language press "SHIFT+F10" to open command prompt and type "menu", press "Y" and next "F" and "Y" again.
 
 The options for recovery options are removed from the script by @murphy78 (no longer supported on 10/11).
 
@@ -152,11 +152,15 @@ Official (support) thread: https://forums.mydigitallife.net/threads/win-11-boot-
 
 Do not ask for support on this modded version on MDL! Create an issue on GitHub:
 
-https://github.com/EntropyKitty/win-11-boot-and-upgrade-fix-kit-mod
+https://github.com/CalliopeSystem/win-11-boot-and-upgrade-fix-kit-mod
 
 ====================================================================
 
 Changelog:
+
+6.1fr
+Fixed typo in README
+Reverted names
 
 6.1f
 Added placeholders so GitHub wouldn't remove empty folders
